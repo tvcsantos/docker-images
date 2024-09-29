@@ -2,6 +2,17 @@
   {
     "id": "radarr",
     "image": "hotio/radarr:latest",
-    "platforms": []
+    "platforms": [
+      {
+        "architecture": "amd64",
+        "os": "linux",
+        "digest": "sha256:df328542a66b8602614dc33562702729556e00faed9a5f299b404be268c23c06"
+      },
+      {
+        "architecture": "arm64",
+        "os": "linux",
+        "digest": "sha256:f511b1744922ef2ff8bf8224435cfd9a647ad7c125d2a46d28d5e8a5303b8146"
+      }
+    ]
   }
 ]
