@@ -1,0 +1,7 @@
+[
+  {
+    "id": "radarr",
+    "image": "hotio/radarr:latest",
+    "platforms": []
+  }
+]
