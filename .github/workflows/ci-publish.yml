@@ -111,8 +111,9 @@ jobs:
                     configuration.platforms.push(platform);
                 }
 
+                const platformId = `${platform.os}/${platform.architecture}`;
+                
                 if (platform.digest !== digest) {
-                    const platformId = `${platform.os}/${platform.architecture}`;
                     console.log(`Image ${image} has a new digest for platform ${platformId}. Update required.`);
                     platform.digest = digest;
                     platformsToUpdate.push(platformId);
