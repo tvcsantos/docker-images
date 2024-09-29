@@ -36,9 +36,9 @@ jobs:
 
             const fs = require('fs/promises');
 
-            const configurations = JSON.parse(await fs.readFile('manifest.json', 'utf8'));
+            const manifest = JSON.parse(await fs.readFile('manifest.json', 'utf8'));
 
-            return configurations.map(c => c.id);
+            return manifest.map(c => c.id);
 
   update-images:
     permissions:
@@ -83,10 +83,10 @@ jobs:
             const fs = require('fs/promises');
             const axios = require('axios');
 
-            const configurations = JSON.parse(await fs.readFile('manifest.json', 'utf8'));
+            const manifest = JSON.parse(await fs.readFile('manifest.json', 'utf8'));
 
             // find configuration with id
-            const configuration = configurations.find(c => c.id === CONFIGURATION_ID);
+            const configuration = manifest.find(c => c.id === CONFIGURATION_ID);
             const image = configuration.image;
             let platforms = configuration.platforms;
             const [name, tag] = image.split(':');
@@ -119,8 +119,7 @@ jobs:
                 }
             }
 
-            // update configurations.json file
-            await fs.writeFile('newConfigurations.json', JSON.stringify(configurations));
+            await fs.writeFile('updatedManifest.json', JSON.stringify(manifest, null, 2));
             return platformsToUpdate.join(',');
 
       - name: Set up Docker Buildx
@@ -147,18 +146,18 @@ jobs:
           cache-from: type=gha # https://docs.docker.com/build/cache/backends/gha/
           cache-to: type=gha,mode=max
 
-      - name: Update configurations
+      - name: Update Manifest
         if: steps.check-for-updates.outputs.result != ''
         shell: bash
         # language=bash
         run: |
-          mv newConfigurations.json configurations.json
+          mv updatedManifest.json manifest.json
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
           if [ -n "$(git status --porcelain)" ]; then
-            git add configurations.json
-            git commit -m "feat: update configurations"
+            git add manifest.json
+            git commit -m "feat: update manifest"
             git push
           else
             echo "No changes to commit"
