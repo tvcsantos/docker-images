@@ -113,9 +113,11 @@ jobs:
 
                 if (platform.digest !== digest) {
                     const platformId = `${platform.os}/${platform.architecture}`;
-                    console.log(`Image ${image} has a new digest for platform ${platformId}`);
+                    console.log(`Image ${image} has a new digest for platform ${platformId}. Update required.`);
                     platform.digest = digest;
                     platformsToUpdate.push(platformId);
+                } else {
+                    console.log(`Image ${image} has the same digest for platform ${platformId}. No update required.`);
                 }
             }
 
