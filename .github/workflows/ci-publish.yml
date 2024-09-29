@@ -141,7 +141,7 @@ jobs:
           push: true
           pull: true
           tags: |
-            ${{ matrix.id }}:latest
+            ${{ github.repository_owner }}/${{ matrix.id }}:latest
           cache-from: type=gha # https://docs.docker.com/build/cache/backends/gha/
           cache-to: type=gha,mode=max
 
