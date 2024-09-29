@@ -41,6 +41,8 @@ jobs:
             return configurations.map(c => c.id);
 
   update-images:
+    permissions:
+      contents: write
     name: Update Images
     runs-on: ubuntu-latest
     needs: get-images
