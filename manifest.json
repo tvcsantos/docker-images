@@ -6,12 +6,12 @@
       {
         "architecture": "amd64",
         "os": "linux",
-        "digest": "sha256:37720c10f2d4e44b938189fef1d664de06bb7fa383236f9b123dbc3b9de3c3df"
+        "digest": "sha256:d657684e794aad9cdc56fae09be6d2fb710240b1136c93943cb8c6cb606990d5"
       },
       {
         "architecture": "arm64",
         "os": "linux",
-        "digest": "sha256:02e41d02b60bfa5eba0085674e2d6dba9a37393f07ab6a5ed8860331b238b4ee"
+        "digest": "sha256:1cb832a2feb7b99133db35fb33b1230f7b21de812d3ab2055aa8b7de5d74dcff"
       }
     ]
   }
