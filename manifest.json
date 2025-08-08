@@ -1,6 +1,7 @@
 [
   {
     "id": "radarr",
+    "registry": "ghcr.io",
     "image": "hotio/radarr:latest",
     "platforms": [
       {

@@ -43,6 +43,7 @@ jobs:
   update-images:
     permissions:
       contents: write
+      packages: read
     name: Update Images
     runs-on: ubuntu-latest
     needs: get-images
@@ -70,15 +71,16 @@ jobs:
         uses: actions/github-script@v7
         env:
           CONFIGURATION_ID: ${{ matrix.id }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           result-encoding: string
           # language=typescript
           script: |
             // noinspection TypeScriptUnresolvedReference
 
-            const { CONFIGURATION_ID } = process.env;
+            const { CONFIGURATION_ID, GH_TOKEN } = process.env;
             
-            console.log(`Checking for updates for configuration ${CONFIGURATION_ID}`);
+            core.info(`Checking for updates for configuration ${CONFIGURATION_ID}`);
             
             const fs = require('fs/promises');
             const axios = require('axios');
@@ -88,17 +90,62 @@ jobs:
             // find configuration with id
             const configuration = manifest.find(c => c.id === CONFIGURATION_ID);
             const image = configuration.image;
+            const registry = configuration.registry;
             let platforms = configuration.platforms;
-            const [name, tag] = image.split(':');
+            const [imageName, tag] = image.split(':');
             if (!platforms) {
                 platforms = [];
                 configuration.platforms = platforms;
             }
             
-            console.log(`Checking for updates for image ${image}`);
-
-            const {data} = await axios.get(`https://registry.hub.docker.com/v2/repositories/${name}/tags/${tag}/`);
-
+            core.info(`Checking for updates for image ${image}`);
+            
+            let data;
+            switch (registry) {
+                case 'ghcr.io': {
+                    core.info(`Checking on GitHub Container Registry`);
+                    // 1. Request an anonymous pull token for this repo
+                    const tokenResp = await axios.get('https://ghcr.io/token', {
+                      params: {
+                        service: 'ghcr.io',
+                        scope: `repository:${imageName}:pull`
+                      },
+                      auth: { username: "oauth2", password: GH_TOKEN }
+                    });
+                    const token = tokenResp.data.token;
+                    core.info("Received token for ghcr.io");
+                
+                    // 2. Check the manifest for the given tag
+                    const manifestUrl = `https://ghcr.io/v2/${imageName}/manifests/${tag}`;
+                    const manifestResp = await axios.get(manifestUrl, {
+                      headers: {
+                        Authorization: `Bearer ${token}`
+                      }
+                    });
+                    const images = manifestResp.data.manifests.map(manifest => {
+                        const {digest, platform} = manifest;
+                        const {os, architecture} = platform;
+                        return {
+                            architecture,
+                            os,
+                            digest
+                        };
+                    });
+                    data = {images};
+                    break;
+                }
+                case undefined: {
+                    core.info(`Checking on Docker Hub`);
+                    const result = await axios.get(`https://registry.hub.docker.com/v2/repositories/${imageName}/tags/${tag}/`);
+                    data = result.data;
+                    break;
+                }
+                default:
+                    throw new Error(`Unsupported registry: ${registry}`);
+            }
+            
+            core.info(`Received data for image ${image}: ${JSON.stringify(data, null, 2)}`);
+            
             const platformsToUpdate = [];
 
             for (const hubImage of (data.images || [])) {
@@ -114,11 +161,11 @@ jobs:
                 const platformId = `${platform.os}/${platform.architecture}`;
                 
                 if (platform.digest !== digest) {
-                    console.log(`Image ${image} has a new digest for platform ${platformId}. Update required.`);
+                    core.info(`Image ${image} has a new digest for platform ${platformId}. Update required.`);
                     platform.digest = digest;
                     platformsToUpdate.push(platformId);
                 } else {
-                    console.log(`Image ${image} has the same digest for platform ${platformId}. No update required.`);
+                    core.info(`Image ${image} has the same digest for platform ${platformId}. No update required.`);
                 }
             }
 
