@@ -119,7 +119,8 @@ jobs:
                     const manifestUrl = `https://ghcr.io/v2/${imageName}/manifests/${tag}`;
                     const manifestResp = await axios.get(manifestUrl, {
                       headers: {
-                        Authorization: `Bearer ${token}`
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.docker.distribution.manifest.v2+json'
                       }
                     });
                     const images = manifestResp.data.manifests.map(manifest => {
