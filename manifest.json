@@ -7,12 +7,12 @@
       {
         "architecture": "amd64",
         "os": "linux",
-        "digest": "sha256:8832a9656d18278c8613b7002612d1196c8311ee46726e5c4fdb49294681f1ad"
+        "digest": "sha256:b0a4fbad91a1d2a5d53142b3a227ca8f839969c5e96ccb35a53d33135dc544d2"
       },
       {
         "architecture": "arm64",
         "os": "linux",
-        "digest": "sha256:13ab9735716e3a342733714a70cea56c2a51a31e5fffa69dced77fa0bc4abd04"
+        "digest": "sha256:fbd305abda053739777f0f6d0b2c8d4356531b7b9fccc49f6e5538f220f449b1"
       }
     ]
   }
